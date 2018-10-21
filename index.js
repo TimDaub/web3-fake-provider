@@ -2,9 +2,42 @@
 
 var chai = require('chai');
 var assert = require('assert');
-var utils = require('../../lib/utils/utils');
 
 countId = 1;
+
+/**
+ * Returns true if object is Objet, otherwise false
+ *
+ * @method isObject
+ * @param {Object}
+ * @return {Boolean}
+ */
+var isObject = function (object) {
+    return object !== null && !(Array.isArray(object)) && typeof object === 'object';
+};
+
+/**
+ * Returns true if object is array, otherwise false
+ *
+ * @method isArray
+ * @param {Object}
+ * @return {Boolean}
+ */
+var isArray = function (object) {
+    return Array.isArray(object);
+};
+
+/**
+ * Returns true if object is function, otherwise false
+ *
+ * @method isFunction
+ * @param {Object}
+ * @return {Boolean}
+ */
+var isFunction = function (object) {
+    return typeof object === 'function';
+};
+
 
 var getResponseStub = function () {
     return {
@@ -32,7 +65,7 @@ var FakeHttpProvider = function () {
 };
 
 FakeHttpProvider.prototype.send = function (payload) {
-    assert.equal(utils.isArray(payload) || utils.isObject(payload), true);
+    assert.equal(isArray(payload) || isObject(payload), true);
     // TODO: validate jsonrpc request
     if (this.error) {
         throw this.error;
@@ -46,8 +79,8 @@ FakeHttpProvider.prototype.send = function (payload) {
 };
 
 FakeHttpProvider.prototype.sendAsync = function (payload, callback) {
-    assert.equal(utils.isArray(payload) || utils.isObject(payload), true);
-    assert.equal(utils.isFunction(callback), true);
+    assert.equal(isArray(payload) || isObject(payload), true);
+    assert.equal(isFunction(callback), true);
     if (this.validation) {
         // imitate plain json object
         this.validation(JSON.parse(JSON.stringify(payload)), callback);
@@ -85,7 +118,7 @@ FakeHttpProvider.prototype.injectBatchResults = function (results, error) {
 FakeHttpProvider.prototype.getResponse = function (payload) {
 
     if(this.response) {
-        if(utils.isArray(this.response)) {
+        if(isArray(this.response)) {
             this.response = this.response.map(function(response, index) {
                 response.id = payload[index] ? payload[index].id : countId++;
                 return response;
